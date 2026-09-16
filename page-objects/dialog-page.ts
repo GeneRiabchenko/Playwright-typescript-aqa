@@ -130,20 +130,26 @@ export class DialogPage extends HelperBase {
     /**
      * Clicks "Enter Name" repeatedly until the "Enter your name" prompt dialog (with the
      * name input) actually appears. This card opens a random dialog variant on each click
-     * (the name prompt, a validation reminder, or nothing), so retrying is required to
-     * reliably reach the name prompt.
+     * (the name prompt, or a validation reminder), so retrying is required to reliably reach
+     * the name prompt. Each attempt waits for whichever dialog opens to actually render before
+     * deciding what to do, then closes it (Escape for the name prompt, its "OK" button for the
+     * reminder, which does not close on Escape) before retrying — this avoids racing a second
+     * click against a dialog that hasn't finished rendering yet.
      * @param maxAttempts safety cap to avoid looping forever if the prompt never appears
      */
     @step
     async openNamePromptDialog(maxAttempts: number = 20) {
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            await this.enterNameButton.click()
+            await this.enterNameButton.click({ timeout: 5000 })
+            await this.dialogContainer.waitFor({ state: 'visible', timeout: 3000 }).catch(() => {})
             if (await this.dialogNameInput.isVisible().catch(() => false)) {
                 return
             }
-            const dialogButton = this.dialogContainer.getByRole('button').first()
-            if (await dialogButton.isVisible().catch(() => false)) {
-                await dialogButton.click()
+            if (await this.dialogContainer.count() > 0) {
+                await this.page.keyboard.press('Escape')
+                if (await this.dialogContainer.count() > 0) {
+                    await this.dialogContainer.getByRole('button').first().click({ timeout: 5000 }).catch(() => {})
+                }
             }
         }
         throw new Error(`Name prompt dialog did not appear after ${maxAttempts} attempts`)
