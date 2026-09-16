@@ -1,0 +1,25 @@
+{
+  "name": "playwright-typescript-aqa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tests-chrome": "npx playwright test --project=chromium",
+    "tests-firefox": "npx playwright test --project=firefox",
+    "tests-webkit": "npx playwright test --project=webkit",
+    "tests-update-snapshots": "npx playwright test --update-snapshots",
+    "smoke-tests": "npx playwright test tests/smoke-tests.spec.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
