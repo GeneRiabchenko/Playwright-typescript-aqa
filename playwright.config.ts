@@ -15,6 +15,9 @@ export default defineConfig({
   testDir: './tests',
   /* Run tests in files in parallel */
   fullyParallel: true,
+  /* CI runners (esp. Firefox) can be slower to start/navigate against the live external
+   * site than a local machine — give CI more headroom than the 30s default. */
+  timeout: process.env.CI ? 60000 : 30000,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
