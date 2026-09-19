@@ -25,7 +25,7 @@ export default defineConfig({
   /* ubuntu-latest runners have 2 vCPUs; run 2 workers on CI instead of serially. */
   workers: process.env.CI ? 2 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['html', { open: 'never' }], ['allure-playwright']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -33,6 +33,9 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /* Attach a page screenshot to failed tests (shows up in the Allure report). */
+    screenshot: 'only-on-failure',
 
     /* Enable test id attribute for easier element selection */
     testIdAttribute: 'data-testid'

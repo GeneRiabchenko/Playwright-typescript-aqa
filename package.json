@@ -8,7 +8,9 @@
     "tests-firefox": "npx playwright test --project=firefox",
     "tests-webkit": "npx playwright test --project=webkit",
     "tests-update-snapshots": "npx playwright test --update-snapshots",
-    "smoke-tests": "npx playwright test tests/smoke-tests.spec.ts"
+    "smoke-tests": "npx playwright test tests/smoke-tests.spec.ts",
+    "test:allure": "allure run -- npx playwright test",
+    "allure:open": "allure open ./allure-report"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +19,9 @@
   "devDependencies": {
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.62.1",
-    "@types/node": "^26.2.0"
+    "@types/node": "^26.2.0",
+    "allure": "^3.18.0",
+    "allure-playwright": "^3.12.2"
   },
   "dependencies": {
     "dotenv": "^17.4.2"
