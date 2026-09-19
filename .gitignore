@@ -6,9 +6,12 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/allure-results/
+/allure-report/
 
 # Visual regression baselines are platform-specific (win32/linux/darwin).
 # CI generates and caches its own (see .github/workflows/playwright.yml);
 # these stay local-only so a Windows-generated baseline never gets pushed
 # and compared against on Linux CI.
 tests/**/*-snapshots/
+/history.jsonl
