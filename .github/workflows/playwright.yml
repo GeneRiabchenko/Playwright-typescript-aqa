@@ -28,10 +28,36 @@ jobs:
 
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'
-      run: npx playwright test --update-snapshots
+      run: |
+        npx playwright test --update-snapshots
+        # this run only creates baselines; keep it out of the Allure report
+        rm -rf allure-results
 
-    - name: Run Playwright tests
-      run: npx playwright test
+    # Allure history (trends) lives in history.jsonl; carry it over between runs.
+    # Keys are immutable, so use a unique key per run and restore the latest one.
+    - name: Restore Allure history
+      uses: actions/cache/restore@v4
+      with:
+        path: history.jsonl
+        key: allure-history-${{ github.run_id }}
+        restore-keys: allure-history-
+
+    - name: Run Playwright tests with Allure
+      run: npx allure run -- npx playwright test
+
+    - name: Save Allure history
+      if: ${{ !cancelled() }}
+      uses: actions/cache/save@v4
+      with:
+        path: history.jsonl
+        key: allure-history-${{ github.run_id }}
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: allure-report
+        path: allure-report/
+        retention-days: 30
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
@@ -39,3 +65,26 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
+
+    # Only main is published to Pages (the github-pages environment rejects PR branches).
+    - uses: actions/upload-pages-artifact@v3
+      if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      with:
+        path: allure-report/
+
+  deploy-report:
+    needs: test
+    if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v4
