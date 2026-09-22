@@ -24,7 +24,7 @@ jobs:
       uses: actions/cache@v4
       with:
         path: tests/**/*-snapshots
-        key: playwright-snapshots-v1
+        key: playwright-snapshots-v2
 
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'

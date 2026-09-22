@@ -94,11 +94,11 @@ Fluent builders with faker-generated defaults and `with*()` overrides, mirrored 
 
 ### Visual regression baselines
 
-Screenshots are platform-specific (font rendering differs win32/linux/darwin), so **`tests/**/*-snapshots/` is gitignored** — baselines are never committed. Locally, Playwright just compares against whatever you last generated with `--update-snapshots` on your own machine. On CI, `.github/workflows/playwright.yml` restores/saves them via `actions/cache` keyed on the static string `playwright-snapshots-v1`:
+Screenshots are platform-specific (font rendering differs win32/linux/darwin), so **`tests/**/*-snapshots/` is gitignored** — baselines are never committed. Locally, Playwright just compares against whatever you last generated with `--update-snapshots` on your own machine. On CI, `.github/workflows/playwright.yml` restores/saves them via `actions/cache` keyed on the static string `playwright-snapshots-v2`:
 - Cache miss (first run ever, or after manually invalidating the key) → runs `playwright test --update-snapshots` once to establish the Linux baseline (and deletes the `allure-results` that run produced, so it doesn't pollute the real Allure report), *then* the real `playwright test` run compares against it.
 - Cache hit → skips straight to the real run, comparing against the previously-cached Linux baseline, so genuine regressions are still caught.
 
-To force CI to regenerate baselines, bump the cache key (`playwright-snapshots-v1` → `v2`) in the workflow.
+**The cache key encodes no information about spec-file paths** — a cache *hit* just means "some snapshot tarball exists under this key," not that it matches the current spec-file layout. If you move/rename a `*.spec.ts` file, its `*-snapshots/` directory moves with it, so the cached tarball (built from the old paths) will restore but won't contain the new path, and every screenshot assertion in that file fails with "snapshot doesn't exist" instead of transparently regenerating (the generate-baseline step only runs on a cache *miss*). Bump the key (`v2` → `v3`, etc.) whenever a spec file with screenshots moves or is renamed — not just when you want to force a baseline refresh.
 
 ### Reporting
 
