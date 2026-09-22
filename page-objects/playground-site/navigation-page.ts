@@ -1,6 +1,6 @@
-import {Page} from "@playwright/test";
+import { Page } from "@playwright/test";
 import { HelperBase } from "./helper-base";
-import { step } from "../helpers/test-step-decorator";
+import { step } from "../../helpers/test-step-decorator";
 
 /**
  * Page object for the left-hand expandable side-navigation menu.

@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test'
-import { NavigationPage } from '../page-objects/navigation-page'
-import { FormLayoutsPage } from '../page-objects/form-layouts-page'
-import { TopNavigationPage } from '../page-objects/top-navigation'
+import { NavigationPage } from './navigation-page'
+import { FormLayoutsPage } from './form-layouts-page'
+import { TopNavigationPage } from './top-navigation'
 import { DatePickerPage } from './date-picker-page'
 import { DialogPage } from './dialog-page'
 

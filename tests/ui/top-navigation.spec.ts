@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test'
-import { test } from '../fixtures/fixture'
+import { test } from '../../fixtures/fixture'
 
 test.describe('Top Navigation Tests', () => {
     test('Collapse and expand left navigation bar', async ({ pom }) => {

@@ -1,6 +1,6 @@
 import { Page, Locator } from "@playwright/test";
 import { HelperBase } from "./helper-base";
-import { step } from "../helpers/test-step-decorator";
+import { step } from "../../helpers/test-step-decorator";
 
 /**
  * Page object for the top navigation header and the left sidebar it controls

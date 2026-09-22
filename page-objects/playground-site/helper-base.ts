@@ -1,5 +1,5 @@
 import { Page, Locator } from '@playwright/test'
-import { step } from '../helpers/test-step-decorator'
+import { step } from '../../helpers/test-step-decorator'
 
 /**
  * Base class all page objects extend. Holds the shared `page` reference plus

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
-import { test } from '../fixtures/fixture'
-import { getRandomDate, getRandomDateRange, getRandomDateNearToday } from '../helpers/date-helper'
+import { test } from '../../fixtures/fixture'
+import { getRandomDate, getRandomDateRange, getRandomDateNearToday } from '../../helpers/date-helper'
 
 test.beforeEach( async ({ pom }) => {
     await pom.navigateTo.expandMenuItemAndSelectCategory('Forms', 'Datepicker')

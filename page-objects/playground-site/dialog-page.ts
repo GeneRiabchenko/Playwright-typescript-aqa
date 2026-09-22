@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test"
 import { HelperBase } from "./helper-base"
-import { step } from "../helpers/test-step-decorator"
+import { step } from "../../helpers/test-step-decorator"
 
 /**
  * Page object for the Dialog page. Models the buttons that open each dialog variant
