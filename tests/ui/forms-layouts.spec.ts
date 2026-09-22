@@ -1,5 +1,5 @@
 import { expect} from '@playwright/test'
-import { test } from '../fixtures/fixture'
+import { test } from '../../fixtures/fixture'
 
 // Every test here takes a screenshot of the filled form, so the input text must be stable
 // between runs; pin the user fields instead of using random faker data.

@@ -1,5 +1,5 @@
 import {test as base} from '@playwright/test'
-import { PageManager } from '../page-objects/page-manager'
+import { PageManager } from '../page-objects/playground-site/page-manager'
 import { TestUser, UserBuilder } from '../test-data/user-builder'
 
 type TestFixtures = {

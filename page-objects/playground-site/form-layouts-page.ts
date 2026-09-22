@@ -1,5 +1,5 @@
 import { Locator, Page} from "@playwright/test"
-import { step } from "../helpers/test-step-decorator";
+import { step } from "../../helpers/test-step-decorator";
 import { HelperBase } from "./helper-base";
 
 /**
