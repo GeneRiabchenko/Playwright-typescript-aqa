@@ -1,26 +1,39 @@
 import { expect } from '@playwright/test'
 import { test } from '../../fixtures/fixture'
+import { checkAccessibility } from '../../helpers/accessibility-helper'
 
 test.describe('Top Navigation Tests', () => {
     test('Collapse and expand left navigation bar', async ({ pom }) => {
         await pom.topNavigationPage.expandOrCompactLeftNavigationBar('compacted')
         await expect(pom.topNavigationPage.getLeftNavBar()).toHaveClass(/compacted/)
         await expect(pom.topNavigationPage.getLeftNavBar()).toHaveScreenshot('left-nav-bar-collapsed.png', { maxDiffPixelRatio: 0.01 })
-
         await pom.topNavigationPage.expandOrCompactLeftNavigationBar('expanded')
         await expect(pom.topNavigationPage.getLeftNavBar()).toHaveClass(/expanded/)
         await expect(pom.topNavigationPage.getLeftNavBar()).toHaveScreenshot('left-nav-bar-expanded.png', { maxDiffPixelRatio: 0.01 })
     })
 
-    test('Select different themes', async ({ pom }) => {
+    test('Select Dark theme', async ({ pom, page }) => {
         await pom.topNavigationPage.selectTheme('Dark')
         await expect(pom.topNavigationPage.getDashboardMainPage()).toHaveScreenshot('dark-theme-selected.png', { maxDiffPixelRatio: 0.01 })
+        await checkAccessibility(page)
+    })
+
+    test('Select Light theme', async ({ pom, page }) => {
         await pom.topNavigationPage.selectTheme('Light')
         await expect(pom.topNavigationPage.getDashboardMainPage()).toHaveScreenshot('light-theme-selected.png', { maxDiffPixelRatio: 0.01 })
+        await checkAccessibility(page)
+    })
+
+    test('Select Cosmic theme', async ({ pom, page }) => {
         await pom.topNavigationPage.selectTheme('Cosmic')
         await expect(pom.topNavigationPage.getDashboardMainPage()).toHaveScreenshot('cosmic-theme-selected.png', { maxDiffPixelRatio: 0.01 })
+        await checkAccessibility(page)
+    })
+
+    test('Select Corporate theme', async ({ pom, page }) => {
         await pom.topNavigationPage.selectTheme('Corporate')
         await expect(pom.topNavigationPage.getDashboardMainPage()).toHaveScreenshot('corporate-theme-selected.png', { maxDiffPixelRatio: 0.01 })
+        await checkAccessibility(page)
     })
 
     test('Search for a term', async ({ pom }) => {
