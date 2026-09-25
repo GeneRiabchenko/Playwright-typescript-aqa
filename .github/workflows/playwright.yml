@@ -5,7 +5,8 @@ on:
   pull_request:
     branches: [ main, master ]
 jobs:
-  test:
+  # Runs once (not per shard) so the snapshot cache is seeded before the matrix starts.
+  prepare-baselines:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
@@ -28,10 +29,83 @@ jobs:
 
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'
-      run: |
-        npx playwright test --update-snapshots
-        # this run only creates baselines; keep it out of the Allure report
-        rm -rf allure-results
+      run: npx playwright test --update-snapshots
+
+  test:
+    needs: prepare-baselines
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2]
+        shardTotal: [2]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+
+    # Restore-only: prepare-baselines owns writing this key.
+    - name: Restore visual regression baselines
+      uses: actions/cache/restore@v4
+      with:
+        path: tests/**/*-snapshots
+        key: playwright-snapshots-v2
+
+    - name: Run Playwright tests (shard ${{ matrix.shardIndex }}/${{ matrix.shardTotal }})
+      run: npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }} --reporter=blob,allure-playwright
+
+    - name: Upload blob report
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: blob-report-${{ matrix.shardIndex }}
+        path: blob-report/
+        retention-days: 1
+
+    - name: Upload Allure results
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-results-${{ matrix.shardIndex }}
+        path: allure-results/
+        retention-days: 1
+
+  merge-reports:
+    needs: test
+    if: ${{ !cancelled() }}
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: lts/*
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Download blob reports
+      uses: actions/download-artifact@v4
+      with:
+        pattern: blob-report-*
+        path: all-blob-reports
+        merge-multiple: true
+
+    - name: Merge into Playwright HTML report
+      run: npx playwright merge-reports --reporter=html ./all-blob-reports
+
+    - name: Download Allure results
+      uses: actions/download-artifact@v4
+      with:
+        pattern: allure-results-*
+        path: allure-results
+        merge-multiple: true
 
     # Allure history (trends) lives in history.jsonl; carry it over between runs.
     # Keys are immutable, so use a unique key per run and restore the latest one.
@@ -42,8 +116,8 @@ jobs:
         key: allure-history-${{ github.run_id }}
         restore-keys: allure-history-
 
-    - name: Run Playwright tests with Allure
-      run: npx allure run -- npx playwright test
+    - name: Generate Allure report
+      run: npx allure generate ./allure-results
 
     - name: Save Allure history
       if: ${{ !cancelled() }}
@@ -73,7 +147,7 @@ jobs:
         path: allure-report/
 
   deploy-report:
-    needs: test
+    needs: merge-reports
     if: ${{ !cancelled() && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:

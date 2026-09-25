@@ -108,4 +108,10 @@ Screenshots are platform-specific (font rendering differs win32/linux/darwin), s
 
 ### CI pipeline (`.github/workflows/playwright.yml`)
 
-`test` job (ubuntu-latest, 2 workers — see config comment): install → restore snapshot cache → conditionally seed baselines → restore Allure history → `allure run -- npx playwright test` → save Allure history → upload `allure-report`/`playwright-report` artifacts → (push to `main` only) upload the Pages artifact. A separate `deploy-report` job publishes it to GitHub Pages, gated to `push` events on `main` (the `github-pages` environment rejects PR-branch deploys). GitHub Pages must be set to **Source: GitHub Actions** in repo settings for that job to succeed.
+Four jobs, run as `prepare-baselines` → `test` (2-shard matrix) → `merge-reports` → `deploy-report`:
+- `prepare-baselines` (once, not per shard): restores/seeds the snapshot cache (`actions/cache@v4`, key `playwright-snapshots-v2`); on a miss runs `playwright test --update-snapshots`. Kept out of the matrix so shards don't duplicate baseline generation or race on saving the same cache key.
+- `test` (matrix `shardIndex: [1, 2]`, `shardTotal: 2`, `fail-fast: false`, 2 workers each): restore-only snapshot cache, then `playwright test --shard=X/2 --reporter=blob,allure-playwright` (the CLI flag replaces the config's reporters for that run), uploading `blob-report-X` and `allure-results-X` artifacts.
+- `merge-reports`: downloads all shard artifacts (`merge-multiple: true`), `playwright merge-reports --reporter=html` → `playwright-report/`, `allure generate ./allure-results` → `allure-report/` (config/history picked up from `allurerc.mjs`; `history.jsonl` restored/saved here, not in the shards), uploads both reports, and (push to `main` only) the Pages artifact.
+- `deploy-report`: publishes to GitHub Pages, gated to `push` events on `main` (the `github-pages` environment rejects PR-branch deploys). GitHub Pages must be set to **Source: GitHub Actions** in repo settings for that job to succeed.
+
+Locally, sharding works the same way (`--shard=1/2`), but the blob reporter wipes `blob-report/` on every run — move each shard's zip out before running the next shard.
