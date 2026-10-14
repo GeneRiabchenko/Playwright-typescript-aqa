@@ -4,6 +4,14 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+env:
+  ACCOUNT_USERNAME: ${{ secrets.ACCOUNT_USERNAME }}
+  ACCOUNT_PASSWORD: ${{ secrets.ACCOUNT_PASSWORD }}
+  BASE_URL: https://playground.bondaracademy.com
+  CONDUIT_URL: https://conduit.bondaracademy.com/
+  TAGS_API_URL: '*/**/api/tags'
+  ARTICLES_API_URL: '*/**/api/articles*'
+  LOGIN_URL: https://conduit-api.bondaracademy.com/api/users/login   
 jobs:
   # Runs once (not per shard) so the snapshot cache is seeded before the matrix starts.
   prepare-baselines:
