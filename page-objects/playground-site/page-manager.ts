@@ -9,15 +9,14 @@ export class PageManager {
     readonly navigateTo: NavigationPage
     readonly formLayoutsPage: FormLayoutsPage
     readonly topNavigationPage: TopNavigationPage
-    readonly DatePickerPage: DatePickerPage
+    readonly datePickerPage: DatePickerPage
     readonly dialogPage: DialogPage
 
     constructor(page: Page) {
         this.navigateTo = new NavigationPage(page)
         this.formLayoutsPage = new FormLayoutsPage(page)
         this.topNavigationPage = new TopNavigationPage(page)
-        this.DatePickerPage = new DatePickerPage(page)
+        this.datePickerPage = new DatePickerPage(page)
         this.dialogPage = new DialogPage(page)
     }
-
 }

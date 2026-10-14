@@ -7,6 +7,8 @@
     "tests-chrome": "npx playwright test --project=chromium",
     "tests-firefox": "npx playwright test --project=firefox",
     "tests-webkit": "npx playwright test --project=webkit",
+    "tests-ui": "npx playwright test tests/ui --project=chromium --project=firefox --project=webkit",
+    "tests-api": "npx playwright test --project=chromium-api --project=firefox-api --project=webkit-api",
     "tests-update-snapshots": "npx playwright test --update-snapshots",
     "smoke-tests": "npx playwright test tests/smoke-tests.spec.ts",
     "test:allure": "allure run -- npx playwright test",

@@ -61,13 +61,32 @@ export default defineConfig({
       },
       dependencies: ['setup'],
     },
-  {
-    name: 'webkit',
-    use: {
-      ...devices['Desktop Safari'],
-      storageState: 'playwright/.auth/user.json',
+    {
+      name: 'webkit',
+      use: {
+        ...devices['Desktop Safari'],
+        storageState: 'playwright/.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
-    dependencies: ['setup'],
+
+    {
+      name: 'firefox-api',
+      testMatch: /api\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'], storageState: 'playwright/.auth/user.json' },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'chromium-api',
+      testMatch: /api\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/user.json' },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'webkit-api',
+      testMatch: /api\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Safari'], storageState: 'playwright/.auth/user.json' },
+      dependencies: ['setup'],
     },
   ],
 
