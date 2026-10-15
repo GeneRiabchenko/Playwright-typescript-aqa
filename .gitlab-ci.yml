@@ -54,7 +54,7 @@ regression:
   script:
     - |
       if ! ls tests/ui/*-snapshots >/dev/null 2>&1; then
-        npx playwright test --update-snapshots tests/ui
+        npx playwright test tests/ui --update-snapshots
       fi
     - npx playwright test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL --reporter=blob,allure-playwright --grep @regression
   artifacts:
@@ -76,4 +76,21 @@ html-report:
     paths: [playwright-report/]
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Publishes the merged HTML report to GitLab Pages (default branch only):
+# https://<namespace>.gitlab.io/<project>/
+# Needs Pages enabled (Deploy → Pages) on the GitLab project.
+pages:
+  stage: report
+  needs:
+    - job: html-report
+      artifacts: true
+  script:
+    - mkdir -p public
+    - cp -r playwright-report/. public/
+  artifacts:
+    paths: [public]
+    expire_in: 30 days
+  rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
