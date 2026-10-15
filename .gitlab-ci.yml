@@ -77,3 +77,20 @@ html-report:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+# Publishes the merged HTML report to GitLab Pages (default branch only):
+# https://<namespace>.gitlab.io/<project>/
+# Needs Pages enabled (Deploy → Pages) on the GitLab project.
+pages:
+  stage: report
+  needs:
+    - job: html-report
+      artifacts: true
+  script:
+    - mkdir -p public
+    - cp -r playwright-report/. public/
+  artifacts:
+    paths: [public]
+    expire_in: 30 days
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
