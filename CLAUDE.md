@@ -126,6 +126,10 @@ Screenshots are platform-specific (font rendering differs win32/linux/darwin), s
 
 **The cache key encodes no information about spec-file paths** — a cache *hit* just means "some snapshot tarball exists under this key," not that it matches the current spec-file layout. If you move/rename a `*.spec.ts` file, its `*-snapshots/` directory moves with it, so the cached tarball (built from the old paths) will restore but won't contain the new path, and every screenshot assertion in that file fails with "snapshot doesn't exist" instead of transparently regenerating (the generate-baseline step only runs on a cache *miss*). Bump the key (`v2` → `v3`, etc.) whenever a spec file with screenshots moves or is renamed — not just when you want to force a baseline refresh.
 
+### Accessibility checks
+
+`checkAccessibility()` (`helpers/accessibility-helper.ts`) is non-blocking by default: critical/serious axe violations are attached to the report and added as an `a11y-known-issue` annotation, but the test passes (the live playground has many unresolved violations). Run with `A11Y_ENFORCE=true` to fail on them.
+
 ### Reporting
 
 - **HTML** (`playwright-report/`) — always generated (`reporter: [['html', ...], ['allure-playwright']]` in `playwright.config.ts`).
