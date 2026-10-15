@@ -18,27 +18,27 @@ test.beforeEach( async ({ pom }) => {
     await pom.navigateTo.expandMenuItemAndSelectCategory('Forms', 'Form Layouts')
 })
 
-test('Fill inline form', async ({ pom, testUser }) => {
+test('Fill inline form', { tag: '@regression' }, async ({ pom, testUser }) => {
     await pom.formLayoutsPage.fillAndSubmitInlineForm(`${testUser.firstName} ${testUser.lastName}`, testUser.email, true)
     await expect(pom.formLayoutsPage.getInlineForm()).toHaveScreenshot('inline-form-filled.png', { maxDiffPixelRatio: 0.01 })
 })
 
-test('Fill grid form', async ({ pom, testUser }) => {
+test('Fill grid form', { tag: '@regression' }, async ({ pom, testUser }) => {
     await pom.formLayoutsPage.fillAndSubmitGridForm(testUser.email, testUser.password, 'Option 1')
     await expect(pom.formLayoutsPage.getGridForm()).toHaveScreenshot('grid-form-filled.png', { maxDiffPixelRatio: 0.01 })
 })
 
-test('Fill basic form', async ({ pom, testUser }) => {
+test('Fill basic form', { tag: ['@smoke', '@regression'] }, async ({ pom, testUser }) => {
     await pom.formLayoutsPage.fillAndSubmitBasicForm(testUser.email, testUser.password, true)
     await expect(pom.formLayoutsPage.getBasicForm()).toHaveScreenshot('basic-form-filled.png', { maxDiffPixelRatio: 0.01 })
 })
 
-test('Fill without labels form', async ({ pom, testUser }) => {
+test('Fill without labels form', { tag: '@regression' }, async ({ pom, testUser }) => {
     await pom.formLayoutsPage.fillAndSubmitWithoutLabelsForm(testUser.email, testUser.subject, testUser.message)
     await expect(pom.formLayoutsPage.getWithoutLabelsForm()).toHaveScreenshot('without-labels-form-filled.png', { maxDiffPixelRatio: 0.01 })
 })
 
-test('Fill horizontal form', async ({ pom, testUser }) => {
+test('Fill horizontal form', { tag: '@regression' }, async ({ pom, testUser }) => {
     await pom.formLayoutsPage.fillAndSubmitHorizontalForm(testUser.email, testUser.password, true)
     await expect(pom.formLayoutsPage.getHorizontalForm()).toHaveScreenshot('horizontal-form-filled.png', { maxDiffPixelRatio: 0.01 })
 })

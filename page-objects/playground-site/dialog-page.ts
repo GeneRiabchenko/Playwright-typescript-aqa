@@ -47,11 +47,10 @@ export class DialogPage extends HelperBase {
     }
 
     /**
-     * Whether a dialog overlay is currently open.
+     * The dialog overlay container; assert with `toBeVisible()` / `toBeHidden()` so Playwright retries.
      */
-    @step
-    async isDialogOpen(): Promise<boolean> {
-        return await this.dialogContainer.count() > 0
+    getDialogContainer(): Locator {
+        return this.dialogContainer
     }
 
     /**

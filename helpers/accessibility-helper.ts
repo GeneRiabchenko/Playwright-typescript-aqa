@@ -47,7 +47,9 @@ export async function checkAccessibility(page: Page, options?: { exclude?: strin
     }
 
     const blocking = violations.filter(v => BLOCKING_IMPACTS.includes(v.impact));
-    expect(blocking, formatViolations(blocking)).toEqual([]);
+    // Compare only rule ids: `blocking` holds full axe nodes (HTML, check data), and a failing
+    // toEqual([]) would serialize that whole diff (~1000 lines/test) — enough to OOM the workers.
+    expect(blocking.map(v => v.id), formatViolations(blocking)).toEqual([]);
 }
 
 function formatViolations(violations: AxeViolation[]): string {

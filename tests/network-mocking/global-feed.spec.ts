@@ -1,4 +1,4 @@
-import { test, expect } from '../../fixtures/api-fixture'
+import { test, expect } from '../../fixtures/network-mocking-fixture'
 import { ArticleBuilder, buildArticlesResponse } from '../../test-data/article-builder'
 
 test.use({ baseURL: process.env.CONDUIT_URL })
@@ -32,32 +32,26 @@ test.beforeEach(async ({ page, mockedArticles }) => {
     await page.goto('/')
 })
 
-test('Global Feed', async ({ apiPom }) => {
-    const expectedTitles = [firstArticle.title, secondArticle.title]
-    expect(await apiPom.globalFeed.getTrimmedArticleTitles()).toEqual(expectedTitles)
+test('Global Feed', { tag: ['@smoke', '@regression'] }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleTitles()).toHaveText([firstArticle.title, secondArticle.title])
 })
 
-test('Article title', async ({ apiPom }) => {
-    const title = await apiPom.globalFeed.getArticleTitleByIndex(0)
-    expect(title).toEqual(firstArticle.title)
+test('Article title', { tag: '@regression' }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleTitleByIndex(0)).toHaveText(firstArticle.title)
 })
 
-test('Article text', async ({ apiPom }) => {
-    const text = await apiPom.globalFeed.getArticleTextByIndex(0)
-    expect(text).toEqual(firstArticle.description)
+test('Article text', { tag: '@regression' }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleTextByIndex(0)).toHaveText(firstArticle.description)
 })
 
-test('Article author', async ({ apiPom }) => {
-    const author = await apiPom.globalFeed.getArticleAuthorByIndex(0)
-    expect(author).toEqual(firstArticle.author.username)
+test('Article author', { tag: '@regression' }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleAuthorByIndex(0)).toHaveText(firstArticle.author.username)
 })
 
-test('Article tags', async ({ apiPom }) => {
-    const tags = await apiPom.globalFeed.getArticleTagsByIndex(0)
-    expect(tags).toEqual(firstArticle.tagList)
+test('Article tags', { tag: '@regression' }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleTagsByIndex(0)).toHaveText(firstArticle.tagList)
 })
 
-test('Article likes', async ({ apiPom }) => {
-    const likes = await apiPom.globalFeed.getArticleLikesByIndex(0)
-    expect(likes).toEqual(firstArticle.favoritesCount)
+test('Article likes', { tag: '@regression' }, async ({ mockPom }) => {
+    await expect(mockPom.globalFeed.getArticleLikesByIndex(0)).toHaveText(String(firstArticle.favoritesCount))
 })

@@ -11,88 +11,43 @@ export class GlobalFeed {
     }
 
     /**
-     * `allTextContents()` doesn't retry. When the feed is first fulfilled by a mocked/modified
-     * route, Angular briefly clears and re-renders the list, so a read can land in that empty
-     * window. Retry until the list is non-empty (or attempts run out) instead of trusting a
-     * single read.
+     * Returned as Locators (not strings) so specs can use auto-retrying assertions such as
+     * `toHaveText([...])` — Playwright then waits out Angular's clear-and-re-render of the feed.
      */
-    private async getAllTrimmedTexts(locator: Locator, maxAttempts: number = 10): Promise<string[]> {
-        for (let attempt = 0; attempt < maxAttempts; attempt++) {
-            await locator.first().waitFor()
-            const texts = await locator.allTextContents()
-            if (texts.length > 0) {
-                return texts.map(text => text.trim())
-            }
-            await this.page.waitForTimeout(100)
-        }
-        return []
+
+    /** All article titles in the feed. */
+    getArticleTitles(): Locator {
+        return this.articlePreviews.locator('h1')
     }
 
-    /**
-     * @returns array of the trimmed article titles shown in the feed
-     */
-    @step
-    async getTrimmedArticleTitles(): Promise<string[]> {
-        return this.getAllTrimmedTexts(this.articlePreviews.locator('h1'))
+    /** @param index 0-based position of the article in the feed */
+    getArticleTitleByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('h1')
     }
 
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns the article's trimmed title
-     */
-    @step
-    async getArticleTitleByIndex(index: number): Promise<string> {
-        const title = await this.articlePreviews.nth(index).locator('h1').textContent()
-        return title!.trim()
+    /** Favorites/likes button (its text is the count). @param index 0-based position */
+    getArticleLikesByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('app-favorite-button button')
     }
 
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns the article's favorites/likes count
-     */
-    @step
-    async getArticleLikesByIndex(index: number): Promise<number> {
-        const likesText = await this.articlePreviews.nth(index).locator('app-favorite-button button').textContent()
-        return Number(likesText?.trim())
+    /** Tag pills of one article. @param index 0-based position */
+    getArticleTagsByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('.tag-list .tag-default')
     }
 
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns array of the article's trimmed tag names
-     */
-    @step
-    async getArticleTagsByIndex(index: number): Promise<string[]> {
-        return this.getAllTrimmedTexts(this.articlePreviews.nth(index).locator('.tag-list .tag-default'))
+    /** @param index 0-based position */
+    getArticleAuthorByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('.author')
     }
 
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns the article's author name
-     */
-    @step
-    async getArticleAuthorByIndex(index: number): Promise<string> {
-        const author = await this.articlePreviews.nth(index).locator('.author').textContent()
-        return author!.trim()
+    /** Publish date as shown in the feed. @param index 0-based position */
+    getArticleDateByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('.date')
     }
 
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns the article's publish date as shown in the feed
-     */
-    @step
-    async getArticleDateByIndex(index: number): Promise<string> {
-        const date = await this.articlePreviews.nth(index).locator('.date').textContent()
-        return date!.trim()
-    }
-
-    /**
-     * @param index 0-based position of the article in the feed
-     * @returns the article's preview text (description)
-     */
-    @step
-    async getArticleTextByIndex(index: number): Promise<string> {
-        const text = await this.articlePreviews.nth(index).locator('.preview-link p').textContent()
-        return text!.trim()
+    /** Preview text (description). @param index 0-based position */
+    getArticleTextByIndex(index: number): Locator {
+        return this.articlePreviews.nth(index).locator('.preview-link p')
     }
 
     /**

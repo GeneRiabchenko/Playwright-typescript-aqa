@@ -20,7 +20,7 @@ export class NavigationPage extends HelperBase {
     async expandMenuItemAndSelectCategory(menuItem: string, category: string) {
         // Check if the menu item is already expanded
         if(!(await this.isMenuExpanded(menuItem))) {
-            await this.page.getByRole('link', { name: menuItem }).click();
+            await this.page.getByRole('link', { name: menuItem, exact: true }).click();
         }
         await this.clickMenuLink(category)
     }
@@ -41,7 +41,7 @@ export class NavigationPage extends HelperBase {
      */
     @step
     async isMenuExpanded(menuName: string): Promise<boolean> {
-        const menu = this.page.getByRole('link', { name: menuName });
+        const menu = this.page.getByRole('link', { name: menuName, exact: true });
         const isExpanded = await menu.getAttribute('aria-expanded');
         return isExpanded === 'true';
     }
@@ -50,7 +50,7 @@ export class NavigationPage extends HelperBase {
     // like axe.analyze() have no locator of their own to auto-wait on, so without this they can
     // scan the previous page's still-mounted DOM mid-navigation.
     private async clickMenuLink(name: string) {
-        const link = this.page.getByRole('link', { name });
+        const link = this.page.getByRole('link', { name, exact: true });
         const href = await link.getAttribute('href');
         await link.click();
         if (href) {

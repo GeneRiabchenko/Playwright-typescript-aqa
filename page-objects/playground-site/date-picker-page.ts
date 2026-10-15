@@ -115,7 +115,9 @@ export class DatePickerPage extends HelperBase {
     async selectYear(year: string, yearLocatorBlock: Locator) {
         let yearsValue
         let trimmedYears
-        while (true){
+        // Each click pages the calendar by one year-block; the cap stops an unreachable year from looping forever.
+        const maxAttempts = 50
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
             yearsValue = await yearLocatorBlock.allTextContents()
             trimmedYears = yearsValue.map(year => year.trim())
             if (trimmedYears.includes(year)) {
@@ -127,6 +129,7 @@ export class DatePickerPage extends HelperBase {
                 await this.page.locator('nb-calendar-pageable-navigation button').last().click()
             }
         }
+        throw new Error(`Year ${year} was not reachable in the calendar after ${maxAttempts} page changes`)
     }
 
 

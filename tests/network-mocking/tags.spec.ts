@@ -1,5 +1,5 @@
-import { test, expect } from '../../fixtures/api-fixture'
-import tags from '../../test-data/api-mocks/tags.json'
+import { test, expect } from '../../fixtures/network-mocking-fixture'
+import tags from '../../test-data/network-mocks/tags.json'
 
 test.use({ baseURL: process.env.CONDUIT_URL })
 
@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
     await page.goto('/')
 })
 
-test('Popular Tags', async ({ apiPom }) =>{
+test('Popular Tags', { tag: '@regression' }, async ({ mockPom }) =>{
     const expectedTage = tags.tags
-    expect(await apiPom.getPopularTrimmedTagsText()).toEqual(expectedTage)
+    await expect(mockPom.getPopularTags()).toHaveText(expectedTage)
 })

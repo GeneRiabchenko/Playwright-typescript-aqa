@@ -3,6 +3,16 @@ import { faker } from '@faker-js/faker';
 const DEFAULT_FROM = new Date('2016-01-01');
 const DEFAULT_TO = new Date('2099-12-31');
 
+/**
+ * Seeds faker so a failing run can be reproduced: uses `FAKER_SEED` when set, otherwise a fresh
+ * random seed. Returns the seed so the caller can attach it to the test report.
+ */
+export function seedFaker(): number {
+    const seed = process.env.FAKER_SEED ? Number(process.env.FAKER_SEED) : Math.floor(Math.random() * 1_000_000);
+    faker.seed(seed);
+    return seed;
+}
+
 function formatDate(date: Date): string {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
