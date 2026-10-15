@@ -8,6 +8,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, process.env.TEST_ENV ? `.env.${process.env.TEST_ENV}` : '.env') });
 
+const AUTH_FILE = 'playwright/.auth/user.json';
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -43,49 +45,40 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // Logs in through the Conduit REST API and saves the session for the projects that need it.
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
+
+    // UI suite (playground site) — no authentication needed.
+    { name: 'chromium', testMatch: /ui\/.*\.spec\.ts/, use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', testMatch: /ui\/.*\.spec\.ts/, use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', testMatch: /ui\/.*\.spec\.ts/, use: { ...devices['Desktop Safari'] } },
+
+    // Conduit UI with mocked network responses — runs as a logged-in user.
     {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-      },
+      name: 'chromium-network-mocking',
+      testMatch: /network-mocking\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'], storageState: AUTH_FILE },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'firefox-network-mocking',
+      testMatch: /network-mocking\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Firefox'], storageState: AUTH_FILE },
+      dependencies: ['setup'],
+    },
+    {
+      name: 'webkit-network-mocking',
+      testMatch: /network-mocking\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Safari'], storageState: AUTH_FILE },
       dependencies: ['setup'],
     },
 
+    // Real REST API tests (`request` fixture) plus API+UI hybrid specs. Browser-independent,
+    // so a single project is enough.
     {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-        storageState: 'playwright/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
-
-    {
-      name: 'firefox-api',
+      name: 'api',
       testMatch: /api\/.*\.spec\.ts/,
-      use: { ...devices['Desktop Firefox'], storageState: 'playwright/.auth/user.json' },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'chromium-api',
-      testMatch: /api\/.*\.spec\.ts/,
-      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/user.json' },
-      dependencies: ['setup'],
-    },
-    {
-      name: 'webkit-api',
-      testMatch: /api\/.*\.spec\.ts/,
-      use: { ...devices['Desktop Safari'], storageState: 'playwright/.auth/user.json' },
+      use: { ...devices['Desktop Chrome'], baseURL: process.env.API_URL, storageState: AUTH_FILE },
       dependencies: ['setup'],
     },
   ],

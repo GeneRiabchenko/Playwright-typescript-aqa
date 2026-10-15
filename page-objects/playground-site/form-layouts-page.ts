@@ -93,6 +93,7 @@ export class FormLayoutsPage extends HelperBase {
      */
     @step
     async selectRadioOption(option: string) {
+        // force: Nebular hides the native <input> behind a custom styled span that intercepts pointer events
         await this.gridForm.getByRole('radio', { name: option }).click({force: true})
     }
 
@@ -103,6 +104,7 @@ export class FormLayoutsPage extends HelperBase {
      */
     @step
     async checkRememberMeCheckbox(block: Locator, checked: boolean) {
+        // force: the native checkbox is visually hidden behind Nebular's custom checkmark
         if (checked) {
             await block.getByRole('checkbox').check({ force: true })
         } else {
@@ -116,6 +118,7 @@ export class FormLayoutsPage extends HelperBase {
      */
     @step
     async checkMeOutCheckbox(checked: boolean) {
+        // force: the native checkbox is visually hidden behind Nebular's custom checkmark
         if (checked) {
             await this.basicForm.getByRole('checkbox').check({ force: true })
         } else {

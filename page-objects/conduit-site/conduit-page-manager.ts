@@ -1,8 +1,8 @@
 import { Page } from '@playwright/test'
 import { GlobalFeed } from './global-feed'
-import { ApiHelperBase } from './api-helper-base'
+import { ConduitHelperBase } from './conduit-helper-base'
 
-export class ApiPageManager extends ApiHelperBase {
+export class ConduitPageManager extends ConduitHelperBase {
     readonly globalFeed: GlobalFeed
 
 

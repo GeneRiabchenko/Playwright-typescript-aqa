@@ -2,6 +2,8 @@ import { Page, Locator } from "@playwright/test";
 import { HelperBase } from "./helper-base";
 import { step } from "../../helpers/test-step-decorator";
 
+export type NavBarState = 'expanded' | 'compacted'
+
 /**
  * Page object for the top navigation header and the left sidebar it controls
  * (sidebar toggle, theme selector, search, profile menu).
@@ -33,7 +35,7 @@ export class TopNavigationPage extends HelperBase {
      * @param state 'expanded' or 'compacted'
      */
     @step
-    async expandOrCompactLeftNavigationBar(state: string) {
+    async expandOrCompactLeftNavigationBar(state: NavBarState) {
         const isLeftNavBarExpanded = await this.leftNavBar.evaluate(el => el.classList.contains('expanded'))
         if ( state === 'expanded' && !isLeftNavBarExpanded ) {
             await this.sideBarToggle.click()
@@ -48,10 +50,20 @@ export class TopNavigationPage extends HelperBase {
      */
     @step
     async selectTheme(themeName: string) {
+        // force: the select's overlay/label intercepts the click on the underlying nb-select button
         await this.themeSelector.click({force: true})
 
         await this.page.locator('nb-option-list nb-option').getByText(themeName).click()
         await this.page.mouse.click(0, 0) // Click outside to close the dropdown
+    }
+
+    getSearchField(): Locator {
+        return this.searchField
+    }
+
+    /** Full-width search overlay; carries the `show` class while it is open. */
+    getSearchOverlay(): Locator {
+        return this.page.locator('nb-search-field')
     }
 
     /**

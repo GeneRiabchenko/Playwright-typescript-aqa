@@ -1,5 +1,4 @@
 import { Page, Locator } from '@playwright/test'
-import { step } from '../../helpers/test-step-decorator'
 
 /**
  * Base class all page objects extend. Holds the shared `page` reference plus
@@ -21,14 +20,4 @@ export class HelperBase {
     getDashboardMainPage(): Locator {
         return this.dashboardMainPage
     }
-
-    /**
-     * Reads the current toastr notification message.
-     */
-    @step
-    protected async getToastrMessage() {
-        // Wait for the toastr message to appear
-        return "I'm cool toaster message!"
-    }
-
 }

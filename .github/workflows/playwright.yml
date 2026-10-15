@@ -11,7 +11,7 @@ env:
   CONDUIT_URL: https://conduit.bondaracademy.com/
   TAGS_API_URL: '*/**/api/tags'
   ARTICLES_API_URL: '*/**/api/articles*'
-  LOGIN_URL: https://conduit-api.bondaracademy.com/api/users/login   
+  API_URL: https://conduit-api.bondaracademy.com/api/
 jobs:
   # Runs once (not per shard) so the snapshot cache is seeded before the matrix starts.
   prepare-baselines:
@@ -24,6 +24,12 @@ jobs:
         node-version: lts/*
     - name: Install dependencies
       run: npm ci
+
+    - name: Type-check (tsc --noEmit)
+      run: npm run typecheck
+
+    - name: Lint (ESLint)
+      run: npm run lint
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps

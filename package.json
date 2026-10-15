@@ -8,11 +8,15 @@
     "tests-firefox": "npx playwright test --project=firefox",
     "tests-webkit": "npx playwright test --project=webkit",
     "tests-ui": "npx playwright test tests/ui --project=chromium --project=firefox --project=webkit",
-    "tests-api": "npx playwright test --project=chromium-api --project=firefox-api --project=webkit-api",
+    "tests-api": "npx playwright test --project=api",
+    "tests-network-mocking": "npx playwright test --project=chromium-network-mocking --project=firefox-network-mocking --project=webkit-network-mocking",
     "tests-update-snapshots": "npx playwright test --update-snapshots",
-    "smoke-tests": "npx playwright test tests/smoke-tests.spec.ts",
     "test:allure": "allure run -- npx playwright test",
-    "allure:open": "allure open ./allure-report"
+    "allure:open": "allure open ./allure-report",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "smoke": "npx playwright test --grep @smoke",
+    "regression": "npx playwright test --grep @regression"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +28,10 @@
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.2.0",
     "allure": "^3.18.0",
-    "allure-playwright": "^3.12.2"
+    "allure-playwright": "^3.12.2",
+    "eslint": "^10.12.0",
+    "typescript": "~6.0.0",
+    "typescript-eslint": "^8.71.2"
   },
   "dependencies": {
     "dotenv": "^17.4.2"

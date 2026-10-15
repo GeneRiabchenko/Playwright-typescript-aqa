@@ -1,7 +1,7 @@
 import { Locator, Page } from '@playwright/test'
 import { step } from "../../helpers/test-step-decorator";
 
-export class ApiHelperBase {
+export class ConduitHelperBase {
     protected readonly page: Page;
 
     private popularTags: Locator
@@ -15,14 +15,10 @@ export class ApiHelperBase {
 
 
     /**
-     * 
-     * @returns array of the trimmed popular tag text
+     * Popular Tags sidebar pills; assert with `toHaveText([...])` (auto-retries until they render).
      */
-    @step
-    async getPopularTrimmedTagsText() {
-        await this.popularTags.first().waitFor()
-        const tags = await this.popularTags.allTextContents()
-        return tags.map(tag => tag.trim())
+    getPopularTags(): Locator {
+        return this.popularTags
     }
 
     /**

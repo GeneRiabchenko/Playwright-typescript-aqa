@@ -23,25 +23,27 @@ const menuPages: { menuItem: string; category: string }[] = [
   { menuItem: 'Auth', category: 'Reset Password' },
 ]
 
-test('App shell (header, sidebar, footer, document) is accessible', async ({ pom, page }) => {
+// `pom` is requested only for its side effect: the fixture navigates to the dashboard.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+test('App shell (header, sidebar, footer, document) is accessible', { tag: '@regression' }, async ({ pom, page }) => {
   // No exclude/disableRules here — this is the one place header/sidebar/footer content and
   // document-wide rules like html-has-lang get tracked, since every other a11y test skips them.
   await checkAccessibility(page)
 })
 
-test('IoT Dashboard page is accessible', async ({ pom, page }) => {
+test('IoT Dashboard page is accessible', { tag: '@regression' }, async ({ pom, page }) => {
   await pom.navigateTo.selectTopLevelPage('IoT Dashboard')
   await checkAccessibility(page, { exclude: APP_CHROME_SELECTORS, disableRules: APP_WIDE_RULES })
 })
 
 for (const { menuItem, category } of menuPages) {
-  test(`${category} page is accessible`, async ({ pom, page }) => {
+  test(`${category} page is accessible`, { tag: '@regression' }, async ({ pom, page }) => {
     await pom.navigateTo.expandMenuItemAndSelectCategory(menuItem, category)
     await checkAccessibility(page, { exclude: APP_CHROME_SELECTORS, disableRules: APP_WIDE_RULES })
   })
 }
 
-test('Dialog is accessible when open', async ({ pom, page }) => {
+test('Dialog is accessible when open', { tag: '@regression' }, async ({ pom, page }) => {
   await pom.navigateTo.expandMenuItemAndSelectCategory('Modal & Overlays', 'Dialog')
   await pom.dialogPage.openDialogWithComponent()
   await checkAccessibility(page, { exclude: APP_CHROME_SELECTORS, disableRules: APP_WIDE_RULES })
