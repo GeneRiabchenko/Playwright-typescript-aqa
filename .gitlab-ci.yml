@@ -29,9 +29,33 @@ typecheck-and-lint:
     - npm run typecheck
     - npm run lint
 
+# Writes the Linux screenshot baselines once and caches them (the repo doesn't commit them: they're
+# platform-specific). Later jobs only pull the cache. `|| true`: this job only exists to write
+# screenshots — real failures (the a11y specs are red on purpose) are reported by smoke/regression.
+prepare-baselines:
+  stage: static
+  timeout: 20m
+  cache:
+    key: playwright-snapshots-v2
+    paths: [tests/**/*-snapshots/]
+    policy: pull-push
+  script:
+    - |
+      if ! ls tests/ui/*-snapshots >/dev/null 2>&1; then
+        npx playwright test tests/ui/forms-layouts.spec.ts tests/ui/top-navigation.spec.ts --update-snapshots --retries=0 --reporter=list || true
+      fi
+
 # Fast gate on every pipeline: API tests + @smoke-tagged UI/mocking tests (chromium only).
 smoke:
   stage: test
+  needs: [prepare-baselines]
+  cache:
+    - key:
+        files: [package-lock.json]
+      paths: [node_modules/]
+    - key: playwright-snapshots-v2
+      paths: [tests/**/*-snapshots/]
+      policy: pull
   script:
     - npx playwright test --grep @smoke --project=chromium --project=chromium-network-mocking --project=setup --project=api
   artifacts:
@@ -44,18 +68,15 @@ smoke:
 regression:
   stage: test
   parallel: 2
-  needs: [typecheck-and-lint]
+  needs: [typecheck-and-lint, prepare-baselines]
   cache:
     - key:
         files: [package-lock.json]
       paths: [node_modules/]
     - key: playwright-snapshots-v2
       paths: [tests/**/*-snapshots/]
+      policy: pull
   script:
-    - |
-      if ! ls tests/ui/*-snapshots >/dev/null 2>&1; then
-        npx playwright test tests/ui --update-snapshots
-      fi
     - npx playwright test --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL --reporter=blob,allure-playwright --grep @regression
   artifacts:
     when: always

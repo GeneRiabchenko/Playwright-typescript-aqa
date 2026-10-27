@@ -121,14 +121,14 @@ Fluent builders with faker-generated defaults and `with*()` overrides, mirrored 
 ### Visual regression baselines
 
 Screenshots are platform-specific (font rendering differs win32/linux/darwin), so **`tests/**/*-snapshots/` is gitignored** — baselines are never committed. Locally, Playwright just compares against whatever you last generated with `--update-snapshots` on your own machine. On CI, `.github/workflows/playwright.yml` restores/saves them via `actions/cache` keyed on the static string `playwright-snapshots-v2`:
-- Cache miss (first run ever, or after manually invalidating the key) → runs `playwright test --update-snapshots` once to establish the Linux baseline (and deletes the `allure-results` that run produced, so it doesn't pollute the real Allure report), *then* the real `playwright test` run compares against it.
+- Cache miss (first run ever, or after manually invalidating the key) → runs `playwright test <screenshot specs> --update-snapshots` once to establish the Linux baseline (and deletes the `allure-results` that run produced, so it doesn't pollute the real Allure report), *then* the real `playwright test` run compares against it.
 - Cache hit → skips straight to the real run, comparing against the previously-cached Linux baseline, so genuine regressions are still caught.
 
 **The cache key encodes no information about spec-file paths** — a cache *hit* just means "some snapshot tarball exists under this key," not that it matches the current spec-file layout. If you move/rename a `*.spec.ts` file, its `*-snapshots/` directory moves with it, so the cached tarball (built from the old paths) will restore but won't contain the new path, and every screenshot assertion in that file fails with "snapshot doesn't exist" instead of transparently regenerating (the generate-baseline step only runs on a cache *miss*). Bump the key (`v2` → `v3`, etc.) whenever a spec file with screenshots moves or is renamed — not just when you want to force a baseline refresh.
 
 ### Accessibility checks
 
-`checkAccessibility()` (`helpers/accessibility-helper.ts`) is non-blocking by default: critical/serious axe violations are attached to the report and added as an `a11y-known-issue` annotation, but the test passes (the live playground has many unresolved violations). Run with `A11Y_ENFORCE=true` to fail on them.
+`checkAccessibility()` (`helpers/accessibility-helper.ts`) **fails the test** on any critical/serious axe violation (moderate/minor are only attached to the report). The live playground currently has real violations (`color-contrast`, `button-name`, `label`, `link-name`, `frame-title`), so the `accessibility-tests.spec.ts` specs and the four theme tests in `top-navigation.spec.ts` are red by design — they are genuine findings, not flakiness. Don't silence them; fix the check's scope (`exclude`/`disableRules` with a comment) only deliberately. Baseline-generation steps in CI (`--update-snapshots`) are `continue-on-error` for exactly this reason: they only exist to write screenshots.
 
 ### Reporting
 

@@ -41,9 +41,14 @@ jobs:
         path: tests/**/*-snapshots
         key: playwright-snapshots-v2
 
+    # continue-on-error: this step only writes screenshots; real failures (e.g. the a11y specs,
+    # which are red on purpose) must not block the test/report jobs that follow.
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'
-      run: npx playwright test --update-snapshots
+      continue-on-error: true
+      timeout-minutes: 15
+      # Only the specs that contain toHaveScreenshot, no retries: a hung/failing a11y spec must not stall this job.
+      run: npx playwright test tests/ui/forms-layouts.spec.ts tests/ui/top-navigation.spec.ts --update-snapshots --retries=0 --reporter=list
 
   test:
     needs: prepare-baselines
