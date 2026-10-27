@@ -46,7 +46,9 @@ jobs:
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'
       continue-on-error: true
-      run: npx playwright test --update-snapshots
+      timeout-minutes: 15
+      # Only the specs that contain toHaveScreenshot, no retries: a hung/failing a11y spec must not stall this job.
+      run: npx playwright test tests/ui/forms-layouts.spec.ts tests/ui/top-navigation.spec.ts --update-snapshots --retries=0 --reporter=list
 
   test:
     needs: prepare-baselines
