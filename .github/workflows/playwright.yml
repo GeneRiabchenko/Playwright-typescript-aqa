@@ -41,8 +41,11 @@ jobs:
         path: tests/**/*-snapshots
         key: playwright-snapshots-v2
 
+    # continue-on-error: this step only writes screenshots; real failures (e.g. the a11y specs,
+    # which are red on purpose) must not block the test/report jobs that follow.
     - name: Generate baseline snapshots (first run only)
       if: steps.snapshot-cache.outputs.cache-hit != 'true'
+      continue-on-error: true
       run: npx playwright test --update-snapshots
 
   test:

@@ -128,7 +128,7 @@ Screenshots are platform-specific (font rendering differs win32/linux/darwin), s
 
 ### Accessibility checks
 
-`checkAccessibility()` (`helpers/accessibility-helper.ts`) is non-blocking by default: critical/serious axe violations are attached to the report and added as an `a11y-known-issue` annotation, but the test passes (the live playground has many unresolved violations). Run with `A11Y_ENFORCE=true` to fail on them.
+`checkAccessibility()` (`helpers/accessibility-helper.ts`) **fails the test** on any critical/serious axe violation (moderate/minor are only attached to the report). The live playground currently has real violations (`color-contrast`, `button-name`, `label`, `link-name`, `frame-title`), so the `accessibility-tests.spec.ts` specs and the four theme tests in `top-navigation.spec.ts` are red by design — they are genuine findings, not flakiness. Don't silence them; fix the check's scope (`exclude`/`disableRules` with a comment) only deliberately. Baseline-generation steps in CI (`--update-snapshots`) are `continue-on-error` for exactly this reason: they only exist to write screenshots.
 
 ### Reporting
 
